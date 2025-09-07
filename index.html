@@ -43,13 +43,29 @@
     .heart-emoji { font-size: 24px; margin: 0 5px; animation: pulse 2s infinite; }
     .custom-notification { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background-color: #4CAF50; color: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); z-index: 1001; opacity: 0; transition: all 0.4s ease; text-align: center; font-size: 16px; }
     .custom-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    @keyframes float { 0% { transform: translateY(100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(-100px) rotate(360deg); opacity: 0; } }
-    @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-    @keyframes confetti { 0% { opacity: 1; transform: translateY(0) rotate(0deg); } 100% { opacity: 0; transform: translateY(100vh) rotate(720deg); } }
-    @keyframes floatHeart { 0% { transform: translateY(100vh) rotate(0deg); } 100% { transform: translateY(-100px) rotate(360deg); } }
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-    @media (max-width: 600px) { .container{ padding: 25px 20px; border-radius: 18px; } h1{ font-size: 36px; margin-bottom: 15px; } .percentage{ font-size: 46px; } .message{ font-size: 16px; } .calculate-btn{ padding: 15px 25px; font-size: 17px; margin-bottom: 15px; } input,select{ padding: 14px 18px; font-size: 16px; } .result{ padding: 20px; min-height: 160px; margin-top: 25px; } .share-notification{ flex-direction: column; gap: 15px; text-align: center; } .share-notification-btn{ width: 100%; } }
-    @media (max-width: 400px) { .container{ padding: 20px 15px; } h1{ font-size: 32px; } .percentage{ font-size: 42px; } .calculate-btn{ padding: 14px 20px; } .result{ padding: 18px; } }
+
+    /* New styles for the hidden share container */
+    #share-content {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      width: 400px;
+      padding: 30px;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+      text-align: center;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      font-family: 'Poppins', sans-serif;
+    }
+    #share-content h2, #share-content h3 {
+      font-family: 'Parisienne', cursive;
+      color: #d64b76;
+    }
+    #share-content .share-percentage {
+      font-family: 'Playfair Display', serif;
+      font-size: 70px;
+      font-weight: 700;
+      color: #d64b76;
+    }
   </style>
 </head>
 <body>
@@ -90,7 +106,7 @@
   <div class="share-notification" id="share-notification">
     <div class="share-notification-text">अपने पार्टनर के साथ अपना लव स्कोर साझा करें!</div>
     <button class="share-notification-btn" id="share-notification-btn">
-      <i class="fas fa-share-alt"></i> Share
+      <i class="fas fa-share-alt"></i> Share as Image
     </button>
   </div>
 
@@ -99,6 +115,16 @@
     Message copied to clipboard!
   </div>
 
+  <!-- A hidden div to generate a clean screenshot -->
+  <div id="share-content">
+    <h2 id="share-title">Love Compatibility</h2>
+    <h3 id="share-names"></h3>
+    <div class="share-percentage" id="share-percentage"></div>
+    <p id="share-message"></p>
+    <p>Made with Love Calculator</p>
+  </div>
+  
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const calculateBtn = document.getElementById('calculate-btn');
@@ -116,6 +142,13 @@
       const shareNotification = document.getElementById('share-notification');
       const shareNotificationBtn = document.getElementById('share-notification-btn');
       const copyNotification = document.getElementById('copy-notification');
+
+      // Share-specific elements
+      const shareContentDiv = document.getElementById('share-content');
+      const shareNamesDiv = document.getElementById('share-names');
+      const sharePercentageDiv = document.getElementById('share-percentage');
+      const shareMessageDiv = document.getElementById('share-message');
+      const shareTitleDiv = document.getElementById('share-title');
 
       // Your app URL
       const appUrl = "https://play.google.com/store/apps/details?id=com.bestapp118.naam_se_jane_rashi";
@@ -175,7 +208,8 @@
             50: "Good potential! You can work on your relationship.",
             0: "You need to put more effort into this relationship."
           },
-          shareNotificationText: "Share your love score with your partner!"
+          shareNotificationText: "Share your love score with your partner!",
+          shareTitle: "Love Compatibility"
         },
         hi: {
           labelName1: "आपका नाम",
@@ -190,7 +224,8 @@
             50: "अच्छी संभावना! आप अपने रिश्ते पर काम कर सकते हैं।",
             0: "आपको इस रिश्ते में और अधिक प्रयास करने की आवश्यकता है।"
           },
-          shareNotificationText: "अपने पार्टनर के साथ अपना लव स्कोर साझा करें!"
+          shareNotificationText: "अपने पार्टनर के साथ अपना लव स्कोर साझा करें!",
+          shareTitle: "प्रेम अनुकूलता"
         },
         ur: {
           labelName1: "آپ کا نام",
@@ -205,7 +240,8 @@
             50: "اچھی صلاحیت! آپ اپنے تعلقات پر کام کر سکتے ہیں۔",
             0: "آپ کو اس رشتے میں مزید کوشش کرنے کی ضرورت ہے۔"
           },
-          shareNotificationText: "اپنے پارٹنر کے ساتھ اپنا لو اسکور شیئر کریں!"
+          shareNotificationText: "اپنے پارٹنر کے ساتھ اپنا لو اسکور شیئر کریں!",
+          shareTitle: "محبت کی مطابقت"
         }
       };
 
@@ -219,6 +255,7 @@
         name2Input.placeholder = t.name2Placeholder;
         calculateBtn.innerHTML = `<i class="fas fa-heart"></i> ${t.calculateBtn}`;
         document.querySelector('.share-notification-text').textContent = t.shareNotificationText;
+        shareTitleDiv.textContent = t.shareTitle;
         if (!name1Input.value || !name2Input.value) {
           messageDiv.textContent = t.defaultMessage;
         }
@@ -248,7 +285,6 @@
         const t = translations[lang] || translations.en;
 
         if (!name1 || !name2) {
-            // Using a custom notification instead of alert()
             showNotification(lang === 'hi' ? 'कृपया दोनों नाम दर्ज करें!' :
                      lang === 'ur' ? 'براہ کرم دونوں نام درج کریں!' :
                        'Please enter both names!');
@@ -325,32 +361,7 @@
           setTimeout(() => { heart.remove(); }, 8000);
         }
       }
-
-      // Share notification button
-      shareNotificationBtn.addEventListener('click', function() {
-        const name1 = name1Input.value.trim() || 'Someone';
-        const name2 = name2Input.value.trim() || 'Someone';
-        const percentage = percentageDiv.textContent;
-        const lang = languageSelect.value;
-        const messages = romanticMessages[lang] || romanticMessages.en;
-        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-
-        const shareText = `Our love compatibility is ${percentage}! 💖 ${randomMessage} Check your love compatibility with Love Calculator: ${appUrl}`;
-
-        if (navigator.share) {
-          navigator.share({
-            title: 'Our Love Compatibility Results',
-            text: shareText,
-            url: appUrl
-          }).catch(error => {
-            fallbackShare(shareText);
-          });
-        } else {
-          fallbackShare(shareText);
-        }
-        shareNotification.classList.remove('show');
-      });
-
+      
       // Function to show a custom notification instead of alert()
       function showNotification(message) {
         const lang = languageSelect.value;
@@ -362,16 +373,56 @@
             copyNotification.classList.remove('show');
         }, 3000);
       }
+      
+      // Share notification button click handler
+      shareNotificationBtn.addEventListener('click', async function() {
+        shareNotification.classList.remove('show');
+        const lang = languageSelect.value;
+        const t = translations[lang] || translations.en;
 
-      // Function to show fallback share
-      function fallbackShare(text) {
-        const tempInput = document.createElement('input');
-        tempInput.value = text;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-        showNotification('Message copied to clipboard!');
+        // Update the content of the hidden div with the result data
+        shareNamesDiv.textContent = `${name1Input.value.trim() || 'Someone'} & ${name2Input.value.trim() || 'Someone'}`;
+        sharePercentageDiv.textContent = percentageDiv.textContent;
+        shareMessageDiv.textContent = messageDiv.textContent;
+
+        try {
+          // Capture the content of the hidden div as an image
+          const canvas = await html2canvas(shareContentDiv, { 
+            scale: 2, // Capture at a higher resolution for better quality
+            backgroundColor: null // Transparent background
+          });
+          
+          const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          const filesArray = [new File([imageBlob], "love_score.png", { type: "image/png" })];
+
+          if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+            await navigator.share({
+              files: filesArray,
+              title: t.shareTitle,
+              text: `${name1Input.value.trim() || 'Someone'} और ${name2Input.value.trim() || 'Someone'} का लव स्कोर!`,
+            });
+          } else {
+            // Fallback for browsers that don't support file sharing
+            fallbackShareImage(canvas);
+          }
+        } catch (error) {
+          console.error("Error sharing image:", error);
+          showNotification('Sharing failed. Please try again.');
+        }
+      });
+
+      // Fallback for image sharing
+      function fallbackShareImage(canvas) {
+        const lang = languageSelect.value;
+        const t = translations[lang] || translations.en;
+        const dataUrl = canvas.toDataURL("image/png");
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'love_score.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showNotification(lang === 'hi' ? 'स्क्रीनशॉट डाउनलोड हो गया है, अब आप इसे शेयर कर सकते हैं!' : 'Screenshot downloaded, you can now share it!');
       }
 
       // Initial hearts (optional on load for fancy effect)
