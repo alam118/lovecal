@@ -6,25 +6,36 @@
   <title>Love Calculator - Calculate Your Love Compatibility</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Parisienne&family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- Tone.js for sound effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
   <style>
+    /* General styles and layout */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-x: hidden; position: relative; padding: 15px; }
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow-x: hidden; position: relative; padding: 25px; }
     .hearts-container { position: fixed; width: 100%; height: 100%; overflow: hidden; z-index: 0; top: 0; left: 0; pointer-events: none; }
     .heart { position: absolute; color: rgba(255, 105, 180, 0.8); font-size: 22px; animation: float 8s ease-in infinite; opacity: 0; }
     .container { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); width: 100%; max-width: 500px; padding: 30px 25px; text-align: center; position: relative; z-index: 1; overflow: hidden; margin-bottom: 25px; }
     .container::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 60%); transform: rotate(30deg); z-index: -1; }
     h1 { font-family: 'Parisienne', cursive; color: #d64b76; font-size: 42px; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); display: flex; justify-content: center; align-items: center; gap: 15px; }
-    .language-selector { margin-bottom: 25px; position: relative; }
-    select { width: 100%; padding: 15px 20px; border: 2px solid #e6e6e6; border-radius: 12px; font-size: 16px; background-color: white; margin-bottom: 15px; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d64b76' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 20px center; background-size: 18px; cursor: pointer; transition: all 0.3s ease; }
-    select:focus { border-color: #d64b76; outline: none; box-shadow: 0 0 0 3px rgba(214, 75, 118, 0.2); }
-    .input-group { margin-bottom: 25px; text-align: left; }
+    
+    /* Spacing between elements */
+    .input-group { margin-bottom: 25px; }
+    .language-selector { margin-bottom: 25px; display: inline-block; position: relative; }
+    .language-selector select { appearance: none; -webkit-appearance: none; -moz-appearance: none; background: #fff; border: 2px solid #ddd; padding: 10px 40px 10px 15px; border-radius: 20px; font-size: 16px; cursor: pointer; outline: none; transition: all 0.3s ease; font-weight: 500; color: #666; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06); }
+    .language-selector select:hover { border-color: #d64b76; }
+    .language-selector select:focus { border-color: #d64b76; box-shadow: 0 0 0 3px rgba(214, 75, 118, 0.2); }
+    .language-selector::after { content: '▼'; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #d64b76; font-size: 12px; pointer-events: none; }
+    
+    .input-group { text-align: left; }
     label { display: block; margin-bottom: 10px; color: #555; font-weight: 500; font-size: 16px; }
     input { width: 100%; padding: 15px 20px; border: 2px solid #e6e6e6; border-radius: 12px; font-size: 16px; transition: all 0.3s ease; }
     input:focus { border-color: #d64b76; outline: none; box-shadow: 0 0 0 3px rgba(214, 75, 118, 0.2); }
-    .calculate-btn { background: linear-gradient(45deg, #ff6b6b, #d64b76); color: white; border: none; padding: 16px 30px; border-radius: 12px; font-size: 18px; cursor: pointer; transition: all .3s ease; font-weight: 600; box-shadow: 0 6px 18px rgba(214, 75, 118, 0.3); width: 100%; margin-bottom: 20px; position: relative; overflow: hidden; }
-    .calculate-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); transition: .5s; }
-    .calculate-btn:hover::before { left: 100%; }
-    .calculate-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(214, 75, 118, 0.4); }
+    .calculate-btn {background:linear-gradient(45deg, #ff6b6b, #d64b76); color:white; border:none; padding:16px 30px; border-radius:12px; font-size:18px; cursor:pointer; transition:all .3s ease; font-weight:600; 
+      box-shadow:0 6px 18px rgba(214,75,118,0.3); width:100%; margin-bottom:20px; position:relative; overflow:hidden;}
+    .calculate-btn::before {content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition:.5s;}
+    .calculate-btn:hover::before {left:100%;}
+    .calculate-btn:hover {transform:translateY(-3px); box-shadow:0 8-px 22px rgba(214,75,118,0.4);}
     .result { margin-top: 30px; padding: 25px; background: linear-gradient(45deg, #fff6f6, #ffeef2); border-radius: 15px; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transform: translateY(20px); transition: all .5s ease; position: relative; overflow: hidden; border: 2px dashed #ff9a9e; }
     .result.show { opacity: 1; transform: translateY(0); }
     .percentage { font-size: 52px; font-weight: 700; color: #d64b76; margin: 10px 0; font-family: 'Playfair Display', serif; text-shadow: 2px 2px 4px rgba(0, 0, 0, .1); }
@@ -35,35 +46,49 @@
     .share-notification-btn { background: linear-gradient(45deg, #2196F3, #0D47A1); color: white; border: none; padding: 10px 20px; border-radius: 50px; font-size: 14px; cursor: pointer; transition: all .3s ease; font-weight: 500; box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3); display: flex; align-items: center; justify-content: center; gap: 8px; }
     .share-notification-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4); }
     .heartbeat { animation: heartbeat 1.2s infinite; }
-    .celebrate { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 2; }
-    .confetti { position: absolute; width: 14px; height: 14px; opacity: 0; animation: confetti 5s ease-in-out; }
-    .floating-hearts { position: fixed; width: 100%; height: 100%; pointer-events: none; z-index: 0; top: 0; left: 0; }
-    .floating-heart { position: absolute; font-size: 24px; color: #ff6b6b; opacity: 0.6; animation: floatHeart 25s linear infinite; }
     .heart-emoji { font-size: 24px; margin: 0 5px; animation: pulse 2s infinite; }
     .custom-notification { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background-color: #4CAF50; color: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); z-index: 1001; opacity: 0; transition: all 0.4s ease; text-align: center; font-size: 16px; }
     .custom-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-    /* New styles for the hidden share container */
-    #share-content {
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
-      width: 400px;
-      padding: 30px;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-      text-align: center;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-      font-family: 'Poppins', sans-serif;
+    /* New "Heart Explosion" Effect */
+    .heart-explosion { position: fixed; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 2; overflow: hidden; }
+    .heart-explosion .heart-piece { position: absolute; font-size: 24px; color: #ff6b6b; animation: explode 1s cubic-bezier(0.2, 0.8, 0.8, 0.2) forwards; opacity: 0; }
+    
+    @keyframes explode {
+      0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--x), var(--y)) scale(1.5);
+        opacity: 0;
+      }
     }
-    #share-content h2, #share-content h3 {
-      font-family: 'Parisienne', cursive;
-      color: #d64b76;
+
+    /* Floating hearts animation for background */
+    .floating-hearts { position: fixed; width: 100%; height: 100%; pointer-events: none; z-index: 0; top: 0; left: 0; }
+    .floating-heart { position: absolute; font-size: 24px; color: #ff6b6b; opacity: 0.6; animation: floatHeart 25s linear infinite; }
+    
+    @keyframes floatHeart {
+      0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+      20% { opacity: 0.6; }
+      100% { transform: translateY(-100vh) translateX(calc(var(--x) * 100px)) rotate(720deg); opacity: 0; }
     }
-    #share-content .share-percentage {
-      font-family: 'Playfair Display', serif;
-      font-size: 70px;
-      font-weight: 700;
-      color: #d64b76;
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    /* New CSS for falling hearts animation */
+    .falling-hearts-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 10; }
+    .falling-heart { position: absolute; font-size: 24px; color: #d64b76; opacity: 0; animation: fall ease-in forwards; }
+    
+    @keyframes fall {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
   </style>
 </head>
@@ -101,29 +126,23 @@
       <div class="message" id="message">अपनी प्रेम अनुकूलता की गणना करने के लिए नाम दर्ज करें</div>
     </div>
   </div>
-  <div class="celebrate" id="celebrate"></div>
+  <!-- New element for heart explosion effect -->
+  <div class="heart-explosion" id="heart-explosion"></div>
+
+  <!-- New container for falling hearts -->
+  <div class="falling-hearts-container" id="falling-hearts-container"></div>
+
   <div class="share-notification" id="share-notification">
     <div class="share-notification-text">अपने पार्टनर के साथ अपना लव स्कोर साझा करें!</div>
     <button class="share-notification-btn" id="share-notification-btn">
-      <i class="fas fa-share-alt"></i> Share as Image
+      <i class="fas fa-share-alt"></i> Share
     </button>
   </div>
-
-  <!-- New custom notification element for clipboard copy feedback -->
+  
   <div class="custom-notification" id="copy-notification">
     Message copied to clipboard!
   </div>
-
-  <!-- A hidden div to generate a clean screenshot -->
-  <div id="share-content">
-    <h2 id="share-title">Love Compatibility</h2>
-    <h3 id="share-names"></h3>
-    <div class="share-percentage" id="share-percentage"></div>
-    <p id="share-message"></p>
-    <p>Made with Love Calculator</p>
-  </div>
   
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const calculateBtn = document.getElementById('calculate-btn');
@@ -132,117 +151,63 @@
       const resultDiv = document.getElementById('result');
       const percentageDiv = document.getElementById('percentage');
       const messageDiv = document.getElementById('message');
-      const celebrateDiv = document.getElementById('celebrate');
+      const heartExplosionDiv = document.getElementById('heart-explosion');
       const heartsContainer = document.getElementById('hearts-container');
       const floatingHearts = document.getElementById('floating-hearts');
       const languageSelect = document.getElementById('language-select');
-      const labelName1 = document = document.getElementById('label-name1');
+      const labelName1 = document.getElementById('label-name1');
       const labelName2 = document.getElementById('label-name2');
       const shareNotification = document.getElementById('share-notification');
       const shareNotificationBtn = document.getElementById('share-notification-btn');
       const copyNotification = document.getElementById('copy-notification');
-
-      // Share-specific elements
-      const shareContentDiv = document.getElementById('share-content');
-      const shareNamesDiv = document.getElementById('share-names');
-      const sharePercentageDiv = document.getElementById('share-percentage');
-      const shareMessageDiv = document.getElementById('share-message');
-      const shareTitleDiv = document.getElementById('share-title');
+      const fallingHeartsContainer = document.getElementById('falling-hearts-container');
 
       // Your app URL
       const appUrl = "https://play.google.com/store/apps/details?id=com.bestapp118.naam_se_jane_rashi";
+      let audioSynth;
+
+      // Initialize Tone.js for audio feedback
+      function setupAudio() {
+        try {
+          if (Tone.context.state !== 'running') {
+            Tone.start();
+          }
+          audioSynth = new Tone.Synth().toDestination();
+        } catch (e) {
+          console.error("Audio context failed to start:", e);
+        }
+      }
 
       // Romantic messages in different languages
       const romanticMessages = {
-        en: [
-          "Our love is a beautiful journey that I want to continue forever. 💖",
-          "You are the missing piece that completes my puzzle of life. 🧩",
-          "Every moment with you feels like a dream come true. 🌟",
-          "My heart beats only for you, now and always. 💓",
-          "You make my world brighter just by being in it. ☀️",
-          "With you, I've found my forever and always. 🌈",
-          "Your love is the greatest gift I've ever received. 🎁",
-          "I fall in love with you more every single day. 💫",
-          "You are my today and all of my tomorrows. 🌅",
-          "Loving you is as natural as breathing. 🌬️"
-        ],
-        hi: [
-          "हमारा प्यार एक खूबसूरत सफर है जो मैं हमेशा जारी रखना चाहता/चाहती हूं। 💖",
-          "तुम वह खोया हुआ टुकड़ा हो जो मेरी जिंदगी की पहेली को पूरा करता है। 🧩",
-          "तुम्हारे साथ हर पल एक सच्चे सपने जैसा लगता है। 🌟",
-          "मेरा दिल सिर्फ तुम्हारे लिए धड़कता है, आज और हमेशा। 💓",
-          "तुम्हारे होने से मेरी दुनिया और चमकदार हो गई है। ☀️",
-          "तुम्हारे साथ, मुझे मेरी हमेशा की खुशी मिल गई है। 🌈",
-          "तुम्हारा प्यार मुझे मिला सबसे बड़ा तोहफा है। 🎁",
-          "मैं हर दिन तुम्हें और ज्यादा प्यार करती/करता हूं। 💫",
-          "तुम मेरा आज और मेरे सभी कल हो। 🌅",
-          "तुम्हें प्यार करना मेरे लिए सांस लेने जैसा स्वाभाविक है। 🌬️"
-        ],
-        ur: [
-          "ہمارا پیار ایک خوبصورت سفر ہے جسے میں ہمیشہ جاری رکھنا چاہتا/چاہتی ہوں۔ 💖",
-          "تم وہ کھویا ہوا ٹکڑا ہو جو میری زندگی کی پہیلی کو مکمل کرتا ہے۔ 🧩",
-          "تمہارے ساتھ ہر پل ایک سچے خواب جیسا لگتا ہے۔ 🌟",
-          "میرا دل صرف تمہارے لیے دھڑکتا ہے، آج اور ہمیشہ۔ 💓",
-          "تمہارے ہونے سے میری دنیا اور چمکدار ہو گئی ہے۔ ☀️",
-          "تمہارے ساتھ، مجھے میری ہمیشہ کی خوشی مل گئی ہے۔ 🌈",
-          "تمہارا پیار مجھے ملا سب سے بڑا تحفہ ہے۔ 🎁",
-          "میں ہر روز تمہیں اور زیادہ پیار کرتی/کرتا ہوں۔ 💫",
-          "تم میرا آج اور میرے سب کل ہو۔ 🌅",
-          "تمہیں پیار کرنا میرے لیے سانس لینے جیسا فطری ہے۔ 🌬️"
-        ]
+        en: ["Our love is a beautiful journey that I want to continue forever. 💖", "You are the missing piece that completes my puzzle of life. 🧩", "Every moment with you feels like a dream come true. 🌟", "My heart beats only for you, now and always. 💓", "You make my world brighter just by being in it. ☀️", "With you, I've found my forever and always. 🌈", "Your love is the greatest gift I've ever received. 🎁", "I fall in love with you more every single day. 💫", "You are my today and all of my tomorrows. 🌅", "Loving you is as natural as breathing. 🌬️"],
+        hi: ["हमारा प्यार एक खूबसूरत सफर है जो मैं हमेशा जारी रखना चाहता/चाहती हूं। 💖", "तुम वह खोया हुआ टुकड़ा हो जो मेरी जिंदगी की पहेली को पूरा करता है। 🧩", "तुम्हारे साथ हर पल एक सच्चे सपने जैसा लगता है। 🌟", "मेरा दिल सिर्फ तुम्हारे लिए धड़कता है, आज और हमेशा। 💓", "तुम्हारे होने से मेरी दुनिया और चमकदार हो गई है। ☀️", "तुम्हारे साथ, मुझे मेरी हमेशा की खुशी मिल गई है। 🌈", "तुम्हारा प्यार मुझे मिला सबसे बड़ा तोहफा है। 🎁", "मैं हर दिन तुम्हें और ज्यादा प्यार करती/करता हूं। 💫", "तुम मेरा आज और मेरे सभी कल हो। 🌅", "तुम्हें प्यार करना मेरे लिए सांस लेने जैसा स्वाभाविक है। 🌬️"],
+        ur: ["ہمارا پیار ایک خوبصورت سفر ہے جسے میں ہمیشہ جاری رکھنا چاہتا/چاہتی ہوں۔ 💖", "تم وہ کھویا ہوا ٹکڑا ہو جو میری زندگی کی پہیلی کو مکمل کرتا ہے۔ 🧩", "تمہارے ساتھ ہر پل ایک سچے خواب جیسا لگتا ہے۔ 🌟", "میرا دل صرف تمہارے لیے دھڑکتا ہے، آج اور ہمیشہ۔ 💓", "تمہارے ہونے سے میری دنیا اور چمکدار ہو گئی ہے ہے۔ ☀️", "تمہارے ساتھ، مجھے میری ہمیشہ کی خوشی مل گئی ہے۔ 🌈", "تمہارا پیار مجھے ملا سب سے بڑا تحفہ ہے۔ 🎁", "میں ہر روز تمہیں اور زیادہ پیار کرتی/کرتا ہوں۔ 💫", "تم میرا آج اور میرے سب کل ہو۔ 🌅", "تمہیں پیار کرنا میرے لیے سانس لینے جیسا فطری ہے۔ 🌬️"]
       };
 
       // Language translations
       const translations = {
         en: {
-          labelName1: "Your Name",
-          labelName2: "Your Partner's Name",
-          name1Placeholder: "Enter first name",
-          name2Placeholder: "Enter second name",
-          calculateBtn: "Calculate Love Compatibility",
-          defaultMessage: "Enter names to calculate your love compatibility",
-          messages: {
-            90: "Perfect match! You are meant for each other!",
-            70: "Great compatibility! You have a strong connection.",
-            50: "Good potential! You can work on your relationship.",
-            0: "You need to put more effort into this relationship."
-          },
-          shareNotificationText: "Share your love score with your partner!",
-          shareTitle: "Love Compatibility"
+          labelName1: "Your Name", labelName2: "Your Partner's Name", name1Placeholder: "Enter first name", name2Placeholder: "Enter second name", calculateBtn: "Calculate Love Compatibility", defaultMessage: "Enter names to calculate your love compatibility",
+          messages: { 90: "Perfect match! You are meant for each other!", 70: "Great compatibility! You have a strong connection.", 50: "Good potential! You can work on your relationship.", 0: "You need to put more effort into this relationship." },
+          shareNotificationText: "Share your love score with your partner!", shareTitle: "Love Compatibility"
         },
         hi: {
-          labelName1: "आपका नाम",
-          labelName2: "आपके साथी का नाम",
-          name1Placeholder: "पहला नाम दर्ज करें",
-          name2Placeholder: "दूसरा नाम दर्ज करें",
-          calculateBtn: "प्यार अनुकूलता की गणना करें",
-          defaultMessage: "अपनी प्रेम अनुकूलता की गणना करने के लिए नाम दर्ज करें",
-          messages: {
-            90: "उत्तम मेल! आप एक दूसरे के लिए बने हैं!",
-            70: "उत्कृष्ट अनुकूलता! आपके बीच मजबूत संबंध है।",
-            50: "अच्छी संभावना! आप अपने रिश्ते पर काम कर सकते हैं।",
-            0: "आपको इस रिश्ते में और अधिक प्रयास करने की आवश्यकता है।"
-          },
-          shareNotificationText: "अपने पार्टनर के साथ अपना लव स्कोर साझा करें!",
-          shareTitle: "प्रेम अनुकूलता"
+          labelName1: "आपका नाम", labelName2: "आपके साथी का नाम", name1Placeholder: "पहला नाम दर्ज करें", name2Placeholder: "दूसरा नाम दर्ज करें", calculateBtn: "प्यार अनुकूलता की गणना करें", defaultMessage: "अपनी प्रेम अनुकूलता की गणना करने के लिए नाम दर्ज करें",
+          messages: { 90: "उत्तम मेल! आप एक दूसरे के लिए बने हैं!", 70: "उत्कृष्ट अनुकूलता! आपके बीच मजबूत संबंध है।", 50: "अच्छी संभावना! आप अपने रिश्ते पर काम कर सकते हैं।", 0: "आपको इस रिश्ते में और अधिक प्रयास करने की आवश्यकता है।" },
+          shareNotificationText: "अपने पार्टनर के साथ अपना लव स्कोर साझा करें!", shareTitle: "प्रेम अनुकूलता"
         },
         ur: {
-          labelName1: "آپ کا نام",
-          labelName2: "آپ کے ساتھی کا نام",
-          name1Placeholder: "پہلا نام درج کریں",
-          name2Placeholder: "دوسرا نام درج کریں",
-          calculateBtn: "محبت کی مطابقت کا حساب لگائیں",
-          defaultMessage: "اپنی محبت کی مطابقت کا حساب لگانے کے لیے نام درج کریں",
-          messages: {
-            90: "بہترین میچ! آپ ایک دوسرے کے لیے بنے ہیں!",
-            70: "زبردست مطابقت! آپ کا مضبوط تعلق ہے۔",
-            50: "اچھی صلاحیت! آپ اپنے تعلقات پر کام کر سکتے ہیں۔",
-            0: "آپ کو اس رشتے میں مزید کوشش کرنے کی ضرورت ہے۔"
-          },
-          shareNotificationText: "اپنے پارٹنر کے ساتھ اپنا لو اسکور شیئر کریں!",
-          shareTitle: "محبت کی مطابقت"
+          labelName1: "آپ کا نام", labelName2: "آپ کے ساتھی کا نام", name1Placeholder: "پہلا نام درج کریں", name2Placeholder: "دوسرا نام درج کریں", calculateBtn: "محبت کی مطابقت کا حساب لگائیں", defaultMessage: "اپنی محبت کی مطابقت کا حساب لگانے کے لیے نام درج کریں",
+          messages: { 90: "بہترین میچ! آپ ایک دوسرے کے لیے بنے ہیں!", 70: "زبردست مطابقت! آپ کا مضبوط تعلق ہے۔", 50: "اچھی صلاحیت! آپ اپنے تعلقات پر کام کر سکتے ہیں۔", 0: "آپ کو اس رشتے میں مزید کوشش کرنے کی ضرورت ہے۔" },
+          shareNotificationText: "اپنے پارٹنر کے ساتھ اپنا لو اسکور شیئر کریں!", shareTitle: "محبت کی مطابقت"
         }
       };
+      
+      const shareMessageTemplates = {
+          hi: (name1, name2, percentage, romanticMessage) => `आप और आपके पार्टनर (${name1} और ${name2}) के बीच प्यार का स्कोर है: ${percentage}\n\n${romanticMessage}\n\nयह लव कैलकुलेटर ऐप डाउनलोड करें: ${appUrl}`,
+          en: (name1, name2, percentage, romanticMessage) => `Our love score is: ${percentage}\nYour Name: ${name1}\nYour Partner's Name: ${name2}\n\n${romanticMessage}\n\nDownload this Love Calculator App: ${appUrl}`
+      }
 
       // Language update UI
       function updateLanguage() {
@@ -254,7 +219,6 @@
         name2Input.placeholder = t.name2Placeholder;
         calculateBtn.innerHTML = `<i class="fas fa-heart"></i> ${t.calculateBtn}`;
         document.querySelector('.share-notification-text').textContent = t.shareNotificationText;
-        shareTitleDiv.textContent = t.shareTitle;
         if (!name1Input.value || !name2Input.value) {
           messageDiv.textContent = t.defaultMessage;
         }
@@ -263,7 +227,7 @@
       updateLanguage();
       languageSelect.addEventListener('change', updateLanguage);
 
-      // Floating hearts
+      // Create floating hearts for background effect
       for (let i = 0; i < 20; i++) {
         const heart = document.createElement('div');
         heart.classList.add('floating-heart');
@@ -293,6 +257,7 @@
         const lovePercentage = calculateLovePercentage(name1, name2);
         resultDiv.classList.remove('show');
 
+        // Play the sound effect and create the explosion after a short delay
         setTimeout(() => {
           percentageDiv.textContent = lovePercentage + '%';
           let message;
@@ -314,8 +279,11 @@
           }
 
           resultDiv.classList.add('show');
-          createCelebration();
-          createHearts();
+          
+          // Trigger the new heart explosion effect and sound
+          createHeartExplosion();
+          playLoveSound();
+          createFallingHearts();
 
           setTimeout(() => {
             shareNotification.classList.add('show');
@@ -334,38 +302,57 @@
         return Math.min(percentage, 100);
       }
 
-      function createCelebration() {
-        celebrateDiv.innerHTML = '';
-        for (let i = 0; i < 60; i++) {
-          const confetti = document.createElement('div');
-          confetti.classList.add('confetti');
-          const colors = ['#ff6b6b', '#d64b76', '#ff9a9e', '#fad0c4', '#a5d8ff', '#c5f9d7'];
-          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-          if (Math.random() > 0.5) { confetti.style.borderRadius = '50%'; }
-          confetti.style.left = Math.random() * 100 + '%';
-          confetti.style.animationDelay = Math.random() * 2 + 's';
-          confetti.style.animationDuration = (2 + Math.random() * 3) + 's';
-          celebrateDiv.appendChild(confetti);
+      // Function to create the heart explosion effect
+      function createHeartExplosion() {
+        heartExplosionDiv.innerHTML = ''; // Clear previous hearts
+        const count = 30; // Number of hearts in the explosion
+        const resultRect = resultDiv.getBoundingClientRect();
+        const centerX = resultRect.left + resultRect.width / 2;
+        const centerY = resultRect.top + resultRect.height / 2;
+        
+        for (let i = 0; i < count; i++) {
+          const heart = document.createElement('div');
+          heart.classList.add('heart-piece');
+          heart.innerHTML = '<i class="fas fa-heart"></i>';
+
+          // Set initial position to the center of the result box
+          heart.style.left = `${centerX}px`;
+          heart.style.top = `${centerY}px`;
+
+          // Calculate random destination
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.random() * 150 + 50; // Random distance from center
+          const destinationX = distance * Math.cos(angle);
+          const destinationY = distance * Math.sin(angle);
+          
+          heart.style.setProperty('--x', `${destinationX}px`);
+          heart.style.setProperty('--y', `${destinationY}px`);
+          
+          heartExplosionDiv.appendChild(heart);
+
+          // Remove heart after animation to free up memory
+          setTimeout(() => heart.remove(), 1000);
         }
       }
 
-      function createHearts() {
-        for (let i = 0; i < 15; i++) {
-          const heart = document.createElement('div');
-          heart.classList.add('heart');
-          heart.innerHTML = '<i class="fas fa-heart"></i>';
-          heart.style.left = Math.random() * 100 + 'vw';
-          heart.style.animationDelay = Math.random() * 3 + 's';
-          heartsContainer.appendChild(heart);
-          setTimeout(() => { heart.remove(); }, 8000);
+      // Function to play a simple synth sound with Tone.js
+      function playLoveSound() {
+        if (!audioSynth) {
+          setupAudio();
+        }
+        if (audioSynth && Tone.context.state === 'running') {
+          // Play a simple chord or note sequence for a "pop" sound
+          const now = Tone.now();
+          audioSynth.triggerAttackRelease("C4", "8n", now);
+          audioSynth.triggerAttackRelease("E4", "8n", now + 0.1);
+          audioSynth.triggerAttackRelease("G4", "8n", now + 0.2);
         }
       }
       
       // Function to show a custom notification instead of alert()
       function showNotification(message) {
         const lang = languageSelect.value;
-        const t = translations[lang] || translations.en;
-        const isCopySuccess = message === 'Message copied to clipboard!' || message.includes('clipboard');
+        const isCopySuccess = message.includes('clipboard');
         copyNotification.textContent = isCopySuccess ? (lang === 'hi' ? 'संदेश क्लिपबोर्ड पर कॉपी हो गया है!' : 'Message copied to clipboard!') : message;
         copyNotification.classList.add('show');
         setTimeout(() => {
@@ -376,56 +363,58 @@
       // Share notification button click handler
       shareNotificationBtn.addEventListener('click', async function() {
         shareNotification.classList.remove('show');
+        const name1 = name1Input.value.trim() || 'Someone';
+        const name2 = name2Input.value.trim() || 'Someone';
+        const percentage = percentageDiv.textContent;
         const lang = languageSelect.value;
-        const t = translations[lang] || translations.en;
-
-        // Update the content of the hidden div with the result data
-        shareNamesDiv.textContent = `${name1Input.value.trim() || 'Someone'} & ${name2Input.value.trim() || 'Someone'}`;
-        sharePercentageDiv.textContent = percentageDiv.textContent;
-        shareMessageDiv.textContent = messageDiv.textContent;
-
-        try {
-          // Capture the content of the hidden div as an image
-          const canvas = await html2canvas(shareContentDiv, { 
-            scale: 2, // Capture at a higher resolution for better quality
-            backgroundColor: null // Transparent background
-          });
-          
-          const imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-          const filesArray = [new File([imageBlob], "love_score.png", { type: "image/png" })];
-
-          if (navigator.canShare && navigator.canShare({ files: filesArray })) {
-            await navigator.share({
-              files: filesArray,
-              title: t.shareTitle,
-              text: `${name1Input.value.trim() || 'Someone'} और ${name2Input.value.trim() || 'Someone'} का लव स्कोर!`,
-            });
-          } else {
-            // Fallback for browsers that don't support file sharing
-            fallbackShareImage(canvas);
-          }
-        } catch (error) {
-          console.error("Error sharing image:", error);
-          showNotification('Sharing failed. Please try again.');
-        }
+        const messages = romanticMessages[lang] || romanticMessages.en;
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        
+        // Construct the new professional share message
+        const shareText = shareMessageTemplates[lang]
+                         ? shareMessageTemplates[lang](name1.toUpperCase(), name2.toUpperCase(), percentage, randomMessage)
+                         : shareMessageTemplates['en'](name1.toUpperCase(), name2.toUpperCase(), percentage, randomMessage);
+        
+        // Copy the message to the clipboard
+        const tempInput = document.createElement('textarea');
+        tempInput.value = shareText;
+        tempInput.style.position = 'absolute';
+        tempInput.style.left = '-9999px';
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        
+        showNotification(lang === 'hi' ? 'संदेश क्लिपबोर्ड पर कॉपी हो गया है!' : 'Message copied to clipboard!');
       });
 
-      // Fallback for image sharing
-      function fallbackShareImage(canvas) {
-        const lang = languageSelect.value;
-        const t = translations[lang] || translations.en;
-        const dataUrl = canvas.toDataURL("image/png");
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = 'love_score.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showNotification(lang === 'hi' ? 'स्क्रीनशॉट डाउनलोड हो गया है, अब आप इसे शेयर कर सकते हैं!' : 'Screenshot downloaded, you can now share it!');
+      // Function to create hearts falling from the top
+      function createFallingHearts() {
+        for (let i = 0; i < 20; i++) {
+          const heart = document.createElement('div');
+          heart.classList.add('falling-heart');
+          heart.innerHTML = '<i class="fas fa-heart"></i>';
+          heart.style.left = Math.random() * 100 + 'vw';
+          heart.style.animationDelay = Math.random() * 2 + 's';
+          heart.style.animationDuration = (3 + Math.random() * 2) + 's';
+          fallingHeartsContainer.appendChild(heart);
+          
+          setTimeout(() => {
+            heart.remove();
+          }, 5000);
+        }
       }
 
-      // Initial hearts (optional on load for fancy effect)
-      createHearts();
+      // Initial hearts (optional on load for a fancy effect)
+      for (let i = 0; i < 15; i++) {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.innerHTML = '<i class="fas fa-heart"></i>';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDelay = Math.random() * 3 + 's';
+        heartsContainer.appendChild(heart);
+        setTimeout(() => { heart.remove(); }, 8000);
+      }
     });
   </script>
 </body>
