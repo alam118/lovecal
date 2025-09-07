@@ -41,6 +41,8 @@
     .floating-hearts { position: fixed; width: 100%; height: 100%; pointer-events: none; z-index: 0; top: 0; left: 0; }
     .floating-heart { position: absolute; font-size: 24px; color: #ff6b6b; opacity: 0.6; animation: floatHeart 25s linear infinite; }
     .heart-emoji { font-size: 24px; margin: 0 5px; animation: pulse 2s infinite; }
+    .custom-notification { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background-color: #4CAF50; color: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); z-index: 1001; opacity: 0; transition: all 0.4s ease; text-align: center; font-size: 16px; }
+    .custom-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     @keyframes float { 0% { transform: translateY(100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(-100px) rotate(360deg); opacity: 0; } }
     @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     @keyframes confetti { 0% { opacity: 1; transform: translateY(0) rotate(0deg); } 100% { opacity: 0; transform: translateY(100vh) rotate(720deg); } }
@@ -69,28 +71,34 @@
       </select>
     </div>
     <div class="input-group">
-      <label id="label-name1" for="name1">Your Name</label>
-      <input type="text" id="name1" placeholder="Enter first name">
+      <label id="label-name1" for="name1">आपका नाम</label>
+      <input type="text" id="name1" placeholder="पहला नाम दर्ज करें">
     </div>
     <div class="input-group">
-      <label id="label-name2" for="name2">Your Partner's Name</label>
-      <input type="text" id="name2" placeholder="Enter second name">
+      <label id="label-name2" for="name2">आपके साथी का नाम</label>
+      <input type="text" id="name2" placeholder="दूसरा नाम दर्ज करें">
     </div>
     <button class="calculate-btn" id="calculate-btn">
-      <i class="fas fa-heart"></i> Calculate Love Compatibility
+      <i class="fas fa-heart"></i> प्यार अनुकूलता की गणना करें
     </button>
     <div class="result" id="result">
       <div class="percentage" id="percentage">0%</div>
-      <div class="message" id="message">Enter names to calculate your love compatibility</div>
+      <div class="message" id="message">अपनी प्रेम अनुकूलता की गणना करने के लिए नाम दर्ज करें</div>
     </div>
   </div>
   <div class="celebrate" id="celebrate"></div>
   <div class="share-notification" id="share-notification">
-    <div class="share-notification-text">Share your love score with your partner!</div>
+    <div class="share-notification-text">अपने पार्टनर के साथ अपना लव स्कोर साझा करें!</div>
     <button class="share-notification-btn" id="share-notification-btn">
       <i class="fas fa-share-alt"></i> Share
     </button>
   </div>
+
+  <!-- New custom notification element for clipboard copy feedback -->
+  <div class="custom-notification" id="copy-notification">
+    Message copied to clipboard!
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const calculateBtn = document.getElementById('calculate-btn');
@@ -107,6 +115,7 @@
       const labelName2 = document.getElementById('label-name2');
       const shareNotification = document.getElementById('share-notification');
       const shareNotificationBtn = document.getElementById('share-notification-btn');
+      const copyNotification = document.getElementById('copy-notification');
 
       // Your app URL
       const appUrl = "https://play.google.com/store/apps/details?id=com.bestapp118.naam_se_jane_rashi";
@@ -239,10 +248,11 @@
         const t = translations[lang] || translations.en;
 
         if (!name1 || !name2) {
-          alert(lang === 'hi' ? 'कृपया दोनों नाम दर्ज करें!' :
+            // Using a custom notification instead of alert()
+            showNotification(lang === 'hi' ? 'कृपया दोनों नाम दर्ज करें!' :
                      lang === 'ur' ? 'براہ کرم دونوں نام درج کریں!' :
                        'Please enter both names!');
-          return;
+            return;
         }
 
         const lovePercentage = calculateLovePercentage(name1, name2);
@@ -341,6 +351,19 @@
         shareNotification.classList.remove('show');
       });
 
+      // Function to show a custom notification instead of alert()
+      function showNotification(message) {
+        const lang = languageSelect.value;
+        const t = translations[lang] || translations.en;
+        const isCopySuccess = message === 'Message copied to clipboard!' || message.includes('clipboard');
+        copyNotification.textContent = isCopySuccess ? (lang === 'hi' ? 'संदेश क्लिपबोर्ड पर कॉपी हो गया है!' : 'Message copied to clipboard!') : message;
+        copyNotification.classList.add('show');
+        setTimeout(() => {
+            copyNotification.classList.remove('show');
+        }, 3000);
+      }
+
+      // Function to show fallback share
       function fallbackShare(text) {
         const tempInput = document.createElement('input');
         tempInput.value = text;
@@ -348,7 +371,7 @@
         tempInput.select();
         document.execCommand('copy');
         document.body.removeChild(tempInput);
-        alert('Message copied to clipboard! You can now share it with your partner.');
+        showNotification('Message copied to clipboard!');
       }
 
       // Initial hearts (optional on load for fancy effect)
