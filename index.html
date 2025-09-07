@@ -26,7 +26,6 @@
     .calculate-btn:hover::before { left: 100%; }
     .calculate-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(214, 75, 118, 0.4); }
     .result { margin-top: 30px; padding: 25px; background: linear-gradient(45deg, #fff6f6, #ffeef2); border-radius: 15px; min-height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transform: translateY(20px); transition: all .5s ease; position: relative; overflow: hidden; border: 2px dashed #ff9a9e; }
-    .result::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, #ff6b6b, #d64b76); }
     .result.show { opacity: 1; transform: translateY(0); }
     .percentage { font-size: 52px; font-weight: 700; color: #d64b76; margin: 10px 0; font-family: 'Playfair Display', serif; text-shadow: 2px 2px 4px rgba(0, 0, 0, .1); }
     .message { font-size: 18px; color: #666; margin-top: 10px; text-align: center; line-height: 1.5; font-weight: 500; }
@@ -137,7 +136,7 @@
       const heartsContainer = document.getElementById('hearts-container');
       const floatingHearts = document.getElementById('floating-hearts');
       const languageSelect = document.getElementById('language-select');
-      const labelName1 = document.getElementById('label-name1');
+      const labelName1 = document = document.getElementById('label-name1');
       const labelName2 = document.getElementById('label-name2');
       const shareNotification = document.getElementById('share-notification');
       const shareNotificationBtn = document.getElementById('share-notification-btn');
